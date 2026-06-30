@@ -4,6 +4,10 @@ import { listAllFaqs, logSearchTerm } from '../utils/firestore'
 import { FaqItem } from './FaqItem'
 import { Sidebar } from './Sidebar'
 
+function stripHtml(html: string) {
+  return html.replace(/<[^>]*>/g, ' ')
+}
+
 export function FaqList() {
   const [faqs, setFaqs] = useState<Faq[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,7 +32,10 @@ export function FaqList() {
     const k = keyword.trim().toLowerCase()
     if (!k) return faqs
     return faqs.filter(
-      (f) => f.question.toLowerCase().includes(k) || f.answer.toLowerCase().includes(k) || f.category.toLowerCase().includes(k)
+      (f) =>
+        f.question.toLowerCase().includes(k) ||
+        stripHtml(f.answer).toLowerCase().includes(k) ||
+        f.category.toLowerCase().includes(k)
     )
   }, [faqs, keyword])
 

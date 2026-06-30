@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { FaqInput } from '../../types'
+import { RichTextEditor } from './RichTextEditor'
 
 interface Props {
   initial?: FaqInput
@@ -12,6 +13,7 @@ export function FaqForm({ initial, submitting, onSubmit, onCancel }: Props) {
   const [question, setQuestion] = useState(initial?.question ?? '')
   const [answer, setAnswer] = useState(initial?.answer ?? '')
   const [category, setCategory] = useState(initial?.category ?? '')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     setQuestion(initial?.question ?? '')
@@ -19,9 +21,18 @@ export function FaqForm({ initial, submitting, onSubmit, onCancel }: Props) {
     setCategory(initial?.category ?? '')
   }, [initial])
 
+  function isAnswerEmpty(html: string) {
+    return html.replace(/<[^>]*>/g, '').trim().length === 0
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    onSubmit({ question: question.trim(), answer: answer.trim(), category: category.trim() })
+    if (isAnswerEmpty(answer)) {
+      setError('Vui lòng nhập nội dung câu trả lời.')
+      return
+    }
+    setError('')
+    onSubmit({ question: question.trim(), answer, category: category.trim() })
   }
 
   return (
@@ -46,14 +57,9 @@ export function FaqForm({ initial, submitting, onSubmit, onCancel }: Props) {
       </div>
       <div>
         <label className="mb-1 block text-xs font-medium text-ink/60">Câu trả lời</label>
-        <textarea
-          required
-          rows={5}
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-        />
+        <RichTextEditor value={answer} onChange={setAnswer} />
       </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex gap-2 pt-1">
         <button
           type="submit"

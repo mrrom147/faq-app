@@ -7,3 +7,20 @@
 body {
   @apply bg-paper text-ink font-body;
 }
+
+/* Nội dung câu trả lời hiển thị ở frontend (đã qua DOMPurify) */
+.faq-answer {
+  @apply prose prose-sm max-w-none prose-headings:font-display prose-headings:text-ink prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-a:text-accent prose-blockquote:border-accent prose-blockquote:text-ink/60;
+}
+
+/* Vùng soạn thảo trong trang Admin — cùng style với phần hiển thị để WYSIWYG đúng nghĩa */
+.faq-editor-content {
+  @apply prose prose-sm max-w-none prose-headings:font-display prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-a:text-accent;
+}
+.faq-editor-content p.is-editor-empty:first-child::before {
+  content: 'Nhập nội dung câu trả lời…';
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: theme('colors.ink/30');
+}

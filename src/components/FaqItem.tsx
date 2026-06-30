@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DOMPurify from 'dompurify'
 import { Faq } from '../types'
 import { incrementViewCount } from '../utils/firestore'
 
@@ -31,7 +32,10 @@ export function FaqItem({ faq }: { faq: Faq }) {
         <div className="border-t border-line bg-accentSoft/40 px-5 py-4">
           <div className="flex items-start gap-3">
             <span className="font-display text-ink/40 font-bold text-sm mt-0.5">A</span>
-            <p className="text-sm leading-relaxed text-ink/80 whitespace-pre-wrap">{faq.answer}</p>
+            <div
+              className="faq-answer text-sm leading-relaxed text-ink/80"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(faq.answer) }}
+            />
           </div>
         </div>
       )}
