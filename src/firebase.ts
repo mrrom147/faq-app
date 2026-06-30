@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
-// Toàn bộ giá trị bên dưới lấy từ Firebase Console > Project settings > Your apps
 // Đặt trong file .env (xem .env.example), KHÔNG commit file .env thật lên git.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
