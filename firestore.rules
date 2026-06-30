@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Hồ sơ user: chỉ chính chủ hoặc admin mới đọc được, không ai tự ghi được (tạo qua Console/Admin SDK)
+    match /users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    // FAQ: ai đã đăng nhập cũng đọc được, nhưng chỉ admin mới thêm/sửa/xoá.
+    // Cho phép user thường update riêng field viewCount (để tăng lượt xem) qua app,
+    // còn lại (question/answer/category) chỉ admin mới sửa.
+    match /faqs/{id} {
+      allow read: if isSignedIn();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        (isSignedIn() &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']));
+    }
+
+    // Thống kê tìm kiếm: ai đã đăng nhập cũng đọc/ghi được (chỉ tăng count)
+    match /searchStats/{term} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+  }
+}
